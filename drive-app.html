@@ -33,6 +33,36 @@
         </div>
       </paper-toolbar>
 
+      <div id="file-splitter" class="flex horizontal layout">
+        <div class="flex panel">
+          <paper-toolbar><div class="layout horizontal">Queue</div></paper-toolbar>
+          <ul class="filelist">
+            <template is="dom-repeat" items="{{uploadList}}" as="file">
+            <li>
+              <strong>{{file.name}}</strong> <span>{{file.type}}</span>
+            </li>
+            </template>
+          </ul>
+        </div>
+
+        <div class="flex panel">
+          <paper-toolbar><div class="layout horizontal">Uploaded</div></paper-toolbar>
+
+          <ul class="filelist">
+            <template is="dom-repeat" items="{{uploadedList}}" as="file">
+              <li>
+                <img src="{{file.iconLink}}">
+                <strong>{{file.title}}</strong>
+                <p>
+                  <a href$="{{file.selfLink}}">Drive URL</a>
+                  <a href$="{{file.webContentLink}}">Web URL</a>
+                </p>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+
     </div>
 
   </template>
