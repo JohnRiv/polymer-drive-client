@@ -1,4 +1,5 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<script src="bower_components/cors-upload-sample/upload.js"></script>
 <dom-module id="drive-app">
   <style></style>
   <template>
@@ -67,6 +68,98 @@
 
   </template>
   <script>
-    Polymer({ is: 'drive-app' });
+    Polymer({
+      is: 'drive-app',
+      properties: {
+        uploadList: {    // selected files
+          type: Array,
+          value: [],
+          notify: true
+        },
+        uploadedList: {  // successfully uploaded files
+          type: Array,
+          value: [],
+          notify: true
+        },
+        autoUpload: { // automatically upload?
+          type: Boolean,
+          value: false,
+          notify: true
+        }
+      },
+
+      computeStyle: function(val) {
+        if (val) {
+          return 'display: none';
+        } else {
+          return 'display: block';
+        }
+      },
+
+      tapSelect: function (e) {
+        if (e.target.id !== 'files') {
+          this.$.files.click();
+        }
+      },
+
+      handleDragOver: function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      },
+
+      handleFilePick: function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+          this.selectFiles(e.target.files);
+      },
+
+      handleFileSelect: function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        this.selectFiles(e.dataTransfer.files);
+      },
+
+      clearUploadList: function () {
+        this.uploadedList = [];
+        this.uploadList = [];
+      },
+
+      uploadFiles: function (files) {
+        var uploadedList = this.uploadedList;
+        this.$.status.innerHTML = 'Uploading...';
+
+        var f;
+        for(var i=0; f = files[i]; i++) {
+          var uploader = new MediaUploader({
+            file: f,
+            token: this.accessToken,
+            onComplete: function (data) {
+              this.push('uploadedList', JSON.parse(data));
+              this.$.status.innerHTML = 'Upload successful';
+              this.uploadList = [];
+            }.bind(this)
+          });
+          uploader.upload();
+        }
+      },
+
+      manualUpload: function () {
+        this.uploadFiles(this.queue);
+      },
+
+      selectFiles: function (files) {
+        this.queue = files;
+        this.$.status.textContent = 'Files selected';
+        var f;
+        for(var i=0; f = files[i]; i++) {
+          this.push('uploadList', f);
+        }
+
+        if(this.autoUpload) {
+          this.uploadFiles(files);
+        }
+      }
+    });
   </script>
 </dom-module>
